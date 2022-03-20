@@ -12,7 +12,7 @@ def cullWords(words, grey, yellow, green):
         
         if not culled:
             for i, char in enumerate(word):
-                if char in grey:
+                if (char in grey) and (char != green[i]):
                     words.remove(word)
                     break
                     
@@ -25,11 +25,13 @@ def cullWords(words, grey, yellow, green):
                     if i in yellow[char]: #if index of char is in list of forbidden positions
                         words.remove(word)
                         break
-    
+                
 def main():
     words = []
     with open("fiveletters.txt") as f:
         words = f.read().split()
+        
+    openers = ["adieu", "among", "audio", "equal", "ratio", "stain", "irate", "stare", "arise", "roast"]
 
     greys = [] #list of chars not in word
     yellows = {} #dict of chars in word but not in right place
@@ -37,26 +39,29 @@ def main():
     
     for l in range(0, 7):
         try:
-            currentWord = words[random.randint(0, len(words) - 1)]
+            if (l == 0):
+                currentWord = openers[random.randint(0, len(openers) - 1)]
+            else:
+                currentWord = words[random.randint(0, len(words) - 1)]
         except ValueError:
             print("I ran out of words, I lose :(")
             break
             
         print("{} (pool size = {})".format(currentWord, len(words)))
         
-        check = input()
+        check = input().lower()[0:5]
         
-        if check.lower()[0:5] == "ggggg":
+        if check == "ggggg":
             print("I win!")
             break
-        elif l == 6:
+        elif l == 5:
             print("I lose :(")
             break
         
-        for i, char in enumerate(check.lower()): #scan input and append to respective lists/dicts
+        for i, char in enumerate(check): #scan input and append to respective lists/dicts
             if char == 'g':
-                if currentWord[i] in greys:
-                    greys.remove(currentWord[i]) #remove if put in greys first
+                #if currentWord[i] in greys:
+                    #greys.remove(currentWord[i]) #remove if put in greys first
                 greens[i] = currentWord[i]
             elif char == 'y':
                 if currentWord[i] not in yellows:
@@ -64,7 +69,7 @@ def main():
                 else:
                     yellows[currentWord[i]].append(i)
             else:
-                if (currentWord[i] not in yellows) and (currentWord[i] not in greens): #prevent double insertion
+                if (currentWord[i] not in yellows): #prevent double insertion
                     greys.append(currentWord[i])
                     
         words.remove(currentWord)
